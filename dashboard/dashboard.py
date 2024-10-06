@@ -34,6 +34,7 @@ def delivery_time(df):
     
 def payment_counts(df):
     payment_counts = df.groupby(by='payment_type').count()['order_id'].sort_values(ascending=False)
+    payment_counts = payment_counts[payment_counts.index != "not_defined"]
     return payment_counts
 
 def customer_counts(df):
@@ -102,25 +103,26 @@ ax.tick_params(axis='y', labelsize=10)
 st.pyplot(fig)
 
 st.title("Category per Cities")
-category_highest_reset = explore_categories_city_data.reset_index()
-category_lowest_reset = explore_categories_city_data.reset_index()
+category_highest_reset = explore_categories_city_data.reset_index().sort_values(by="count" ascending=False)
+category_lowest_reset = explore_categories_city_data.reset_index().sort_values(by="count" ascending=True)
 
-colors = ["#72BCD4", "#D3D3D3", "#D3D3D3", "#D3D3D3", "#D3D3D3"]
+colors_highest = ["#72BCD4", "#D3D3D3", "#D3D3D3", "#D3D3D3", "#D3D3D3"]
 
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(24, 6))
 
 #Bar plot untuk 5 kategori dengan penjualan terbanyak
 sns.barplot(x=category_highest_reset.head(5)['count'], 
             y=category_highest_reset.head(5)['product_category_name'], 
-            palette=colors, ax=ax[0])
+            palette=colors_highest, ax=ax[0])
 ax[0].set_title("Top 5 Most Sold Product Categories", fontsize=15)
 ax[0].set_xlabel("Count")
 ax[0].set_ylabel("Product Category")
 
+colors_lowest = ["#FF6F61", "#D3D3D3", "#D3D3D3", "#D3D3D3", "#D3D3D3"]
 # Bar plot untuk 5 kategori dengan penjualan tersedikit
 sns.barplot(x=category_lowest_reset.head(5)['count'], 
             y=category_lowest_reset.head(5)['product_category_name'], 
-            palette=colors, ax=ax[1])
+            palette=colors_lowest, ax=ax[1])
 ax[1].set_title("Top 5 Least Sold Product Categories", fontsize=15)
 ax[1].set_xlabel("Count")
 ax[1].set_ylabel(None)
@@ -169,8 +171,9 @@ ax[0].set_title("Top 5 Fastest Cities by Delivery Time", fontsize=15)
 ax[0].set_xlabel("Average Delivery Time (Hours)")
 ax[0].set_ylabel("State")
 
-sns.barplot(x=average_delivery_time['delivery_time'].tail(5), 
-            y=average_delivery_time['customer_city'].tail(5), 
+average_delivery_time.sort_values(by="delivery_time", ascending=True)
+sns.barplot(x=average_delivery_time['delivery_time'].head(5), 
+            y=average_delivery_time['customer_city'].head(5), 
             palette=colors_slowest, ax=ax[1])
 ax[1].set_title("Top 5 Slowest Cities by Delivery Time", fontsize=15)
 ax[1].set_xlabel("Average Delivery Time (Hours)")
