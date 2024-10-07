@@ -38,7 +38,7 @@ def payment_counts(df):
     return payment_counts
 
 def customer_counts(df):
-    customer_count = df.groupby(by="customer_city").count()['customer_unique_id'].sort_values(ascending=False).head(20)
+    customer_count = df.groupby(by="customer_state").count()['customer_unique_id'].sort_values(ascending=False).head(20)
     return customer_count
 
 def top_3_categories_city(df):
@@ -114,35 +114,6 @@ ax.tick_params(axis='y', labelsize=10)
 # Display the plot in Streamlit
 st.pyplot(fig)
 
-st.title("Category per Cities")
-category_highest_reset = category_highest.reset_index().sort_values(by="count",ascending=False)
-category_lowest_reset = category_lowest.reset_index().sort_values(by="count",ascending=True)
-
-colors_highest = ["#72BCD4", "#D3D3D3", "#D3D3D3", "#D3D3D3", "#D3D3D3"]
-
-fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(24, 6))
-
-#Bar plot untuk 5 kategori dengan penjualan terbanyak
-sns.barplot(x=category_highest_reset.head(5)['count'], 
-            y=category_highest_reset.head(5)['product_category_name_english'], 
-            palette=colors_highest, ax=ax[0])
-ax[0].set_title("Top 5 Most Sold Product Categories", fontsize=15)
-ax[0].set_xlabel("Count")
-ax[0].set_ylabel("Product Category")
-
-colors_lowest = ["#FF6F61", "#D3D3D3", "#D3D3D3", "#D3D3D3", "#D3D3D3"]
-# Bar plot untuk 5 kategori dengan penjualan tersedikit
-sns.barplot(x=category_lowest_reset.head(5)['count'], 
-            y=category_lowest_reset.head(5)['product_category_name_english'], 
-            palette=colors_lowest, ax=ax[1])
-ax[1].set_title("Top 5 Least Sold Product Categories", fontsize=15)
-ax[1].set_xlabel("Count")
-ax[1].set_ylabel(None)
-ax[1].yaxis.tick_right()
-
-plt.tight_layout()
-st.pyplot(fig)
-
 st.title("Top 3 Categories for Each City")
 top_cities = explore_categories_city_data.groupby('customer_city')['count'].sum().nlargest(10).index
 
@@ -166,6 +137,13 @@ plt.figure(figsize=(8, 8))
 plt.bar(x=payment_counts_data.index, height=payment_counts_data, color="#72BCD4")
 plt.xticks(rotation=45)
 plt.title('Distribution of Payment Types', fontsize=16)
+st.pyplot(plt)
+
+st.title("Distribution of Customer")
+plt.figure(figsize=(8, 8))
+plt.bar(x=customer_counts_data.index, height=customer_counts_data.values, color="#72BCD4")
+plt.xticks(rotation=45)
+plt.title('Distribution of Customers', fontsize=16)
 st.pyplot(plt)
 
 st.title("Average Delivery Time per Cities")
